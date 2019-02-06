@@ -2,24 +2,27 @@ package home.stanislavpoliakov.meet15_practice.presentation.view;
 
 import android.support.v7.util.DiffUtil;
 
-import home.stanislavpoliakov.meet15_practice.response_data.WDailyData;
+import java.util.List;
+
+import home.stanislavpoliakov.meet15_practice.domain.response_data.WDailyData;
+import home.stanislavpoliakov.meet15_practice.presentation.presenter.BriefData;
 
 public class DiffCall extends DiffUtil.Callback {
-    private WDailyData[] oldData, newData;
+    private List<BriefData> oldData, newData;
 
-    public DiffCall(WDailyData[] oldData, WDailyData[] newData) {
+    public DiffCall(List<BriefData> oldData, List<BriefData> newData) {
         this.oldData = oldData;
         this.newData = newData;
     }
 
     @Override
     public int getOldListSize() {
-        return oldData.length;
+        return oldData.size();
     }
 
     @Override
     public int getNewListSize() {
-        return newData.length;
+        return newData.size();
     }
 
     @Override

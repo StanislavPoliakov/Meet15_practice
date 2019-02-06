@@ -11,17 +11,19 @@ import android.widget.TextView;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
 import home.stanislavpoliakov.meet15_practice.R;
-import home.stanislavpoliakov.meet15_practice.response_data.WDailyData;
+import home.stanislavpoliakov.meet15_practice.domain.response_data.WDailyData;
+import home.stanislavpoliakov.meet15_practice.presentation.presenter.BriefData;
 
 public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
     private static final String TAG = "meet15_logs";
-    private WDailyData[] data;
+    private List<BriefData> data;
     private Callback mActivity;
 
-    public MyAdapter(Context context, WDailyData[] data) {
-        this.data = data.clone();
+    public MyAdapter(Context context, List<BriefData> data) {
+        this.data = data;
         this.mActivity = (Callback) context;
     }
 
@@ -34,18 +36,18 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
 
     @Override
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
-        Date date = new Date(data[position].time * 1000);
+        Date date = new Date(data.get(position).getTime() * 1000);
 
         //Старый метод работы со временем. Оставлю, как напоминание. В остальной программе - Java.Util.Time
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM");
         String dateString = dateFormat.format(date);
         holder.dailyTime.setText(dateString);
 
-        double fMin = data[position].temperatureMin;
+        double fMin = data.get(position).getTemperatureMin();
         long tempMin = Math.round((fMin - 32) * 5 / 9);
         String tMinString = (tempMin > 0) ? ("+" + String.valueOf(tempMin)) : String.valueOf(tempMin);
 
-        double fMax = data[position].temperatureMax;
+        double fMax = data.get(position).getTemperatureMax();
         long tempMax = Math.round((fMax - 32) * 5 / 9);
         String tMaxString = (tempMax > 0) ? ("+" + String.valueOf(tempMax)) : String.valueOf(tempMax);
         // Лень прикручивать StringBuilder
@@ -55,14 +57,15 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
 
     @Override
     public int getItemCount() {
-        return data.length;
+        return data.size();
     }
 
-    public void onNewData(WDailyData[] newData) {
+    public void onNewData(List<BriefData> newData) {
         DiffUtil.DiffResult result = DiffUtil.calculateDiff(new DiffCall(data, newData));
         result.dispatchUpdatesTo(this);
 
-        data = newData.clone();
+        data.clear();
+        data.addAll(newData);
         notifyDataSetChanged();
     }
 

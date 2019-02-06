@@ -4,6 +4,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Handler;
 import android.os.Message;
+import android.support.v4.app.DialogFragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -21,9 +23,8 @@ import java.util.List;
 import home.stanislavpoliakov.meet15_practice.R;
 import home.stanislavpoliakov.meet15_practice.domain.DomainContract;
 import home.stanislavpoliakov.meet15_practice.presentation.ViewContract;
-import home.stanislavpoliakov.meet15_practice.presentation.presenter.Briefed;
-import home.stanislavpoliakov.meet15_practice.presentation.presenter.Detailed;
-import home.stanislavpoliakov.meet15_practice.presentation.presenter.Presenter;
+import home.stanislavpoliakov.meet15_practice.presentation.presenter.BriefData;
+import home.stanislavpoliakov.meet15_practice.presentation.presenter.DetailData;
 
 public class ViewActivity extends AppCompatActivity implements ViewContract, Callback {
     private static final String TAG = "meet15_logs";
@@ -31,9 +32,10 @@ public class ViewActivity extends AppCompatActivity implements ViewContract, Cal
     private RecyclerView recyclerView;
     private MyAdapter mAdapter;
     private Spinner spinner;
-    private List<Briefed> data;
+    private List<BriefData> data;
     private DomainContract.Presenter mPresenter;
     private static Handler mHandler;
+    private FragmentManager fragmentManager = getSupportFragmentManager();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,6 +55,17 @@ public class ViewActivity extends AppCompatActivity implements ViewContract, Cal
     }
 
     @Override
+    public void bindImplementations(DomainContract.Presenter presenter,
+                                    DomainContract.UseCase useCaseInteractor,
+                                    DomainContract.NetworkOperations networkGateway,
+                                    DomainContract.DatabaseOperations databaseGateway) {
+        this.mPresenter = presenter;
+        mPresenter.bindImplementations(useCaseInteractor, networkGateway, databaseGateway);
+        initUIViews();
+
+    }
+
+    @Override
     public void setLabel(String label) {
         weatherLabel.setText(label);
     }
@@ -63,14 +76,22 @@ public class ViewActivity extends AppCompatActivity implements ViewContract, Cal
     }
 
     @Override
-    public void displayBrief(List<Briefed> wBriefData) {
-        if (mAdapter == null) initRecyclerView(wBriefData);
-        else updateRecyclerView(wBriefData);
+    public void displayBrief(List<BriefData> wBriefData) {
+        runOnUiThread(() -> {
+            if (mAdapter == null) initRecyclerView(wBriefData);
+            else updateRecyclerView(wBriefData);
+        });
     }
 
     @Override
-    public void showDetails(Detailed wDetailsData) {
-
+    public void showDetails(Bundle detailInfo) {
+        runOnUiThread(() -> {
+            DetailFragment fragment = DetailFragment.newInstance();
+            fragment.setArguments(detailInfo);
+            fragmentManager.beginTransaction()
+                    .add(fragment, "Detail")
+                    .commitNow();
+        });
     }
 
     private void initUIViews() {
@@ -84,18 +105,18 @@ public class ViewActivity extends AppCompatActivity implements ViewContract, Cal
         weatherLabel = findViewById(R.id.weatherLabel);
     }
 
-    private void initRecyclerView(List<Briefed> wBriefData) {
+    private void initRecyclerView(List<BriefData> wBriefData) {
         this.data = wBriefData;
         recyclerView = findViewById(R.id.recyclerView);
-        //mAdapter = new MyAdapter(this, data);
+        mAdapter = new MyAdapter(this, data);
         recyclerView.setAdapter(mAdapter);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this,
                 LinearLayoutManager.VERTICAL, false);
         recyclerView.setLayoutManager(layoutManager);
     }
 
-    private void updateRecyclerView(List<Briefed> newData) {
-        //mAdapter.onNewData(newData);
+    private void updateRecyclerView(List<BriefData> newData) {
+        mAdapter.onNewData(newData);
     }
 
     private void initSpinner() {

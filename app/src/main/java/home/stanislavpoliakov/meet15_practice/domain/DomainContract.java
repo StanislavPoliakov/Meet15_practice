@@ -6,19 +6,46 @@ public interface DomainContract {
 
     interface Presenter {
 
-        void displayBriefData(List<BriefData> briefData);
+        void show(Weather weather);
 
-        void displayDetailsData(DetailData detailData);
+        /*void displayBriefData(List<BriefData> briefData);
+
+        void displayDetailsData(DetailData detailData);*/
 
         void onSpinnerSelected(String cityName);
 
         void onViewHolderSelected(int itemPosition);
+
+        void bindImplementations(DomainContract.UseCase useCaseInteractor,
+                                 DomainContract.NetworkOperations networkGateway,
+                                 DomainContract.DatabaseOperations databaseGateway);
     }
 
-    interface UserInput {
+    interface UseCase {
 
-        void citySelected();
+        void onCitySelected(String cityLocation);
 
-        void fetchDetailData();
+        void bindNetworkGateway(DomainContract.NetworkOperations networkGateway);
+
+        void bindImplementations(DomainContract.Presenter presenter,
+                                 DomainContract.NetworkOperations networkGateway,
+                                 DomainContract.DatabaseOperations databaseGateway);
+    }
+
+    interface DatabaseLoad {
+
+    }
+
+    interface DatabaseOperations {
+
+        void saveData(Weather weather);
+
+        Weather loadData();
+
+    }
+
+    interface NetworkOperations {
+
+        Weather fetchData(String cityLocation);
     }
 }

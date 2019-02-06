@@ -9,6 +9,8 @@ import android.util.Log;
 
 import java.io.IOException;
 
+import home.stanislavpoliakov.meet15_practice.data.network.RetrofitHelper;
+import home.stanislavpoliakov.meet15_practice.domain.Weather;
 import retrofit2.Response;
 
 public class MyService extends Service {

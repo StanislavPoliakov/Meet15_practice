@@ -26,13 +26,19 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import home.stanislavpoliakov.meet15_practice.data.database.DatabaseGateway;
+import home.stanislavpoliakov.meet15_practice.data.database.WeatherDAO;
+import home.stanislavpoliakov.meet15_practice.data.database.WeatherDatabase;
+import home.stanislavpoliakov.meet15_practice.data.network.NetworkGateway;
+import home.stanislavpoliakov.meet15_practice.domain.UseCaseInteractor;
+import home.stanislavpoliakov.meet15_practice.domain.Weather;
 import home.stanislavpoliakov.meet15_practice.presentation.ViewContract;
 import home.stanislavpoliakov.meet15_practice.presentation.presenter.Presenter;
 import home.stanislavpoliakov.meet15_practice.presentation.view.Callback;
 import home.stanislavpoliakov.meet15_practice.presentation.view.DetailFragment;
 import home.stanislavpoliakov.meet15_practice.presentation.view.MyAdapter;
 import home.stanislavpoliakov.meet15_practice.presentation.view.ViewActivity;
-import home.stanislavpoliakov.meet15_practice.response_data.WDailyData;
+import home.stanislavpoliakov.meet15_practice.domain.response_data.WDailyData;
 
 public class MainActivity extends AppCompatActivity implements Callback {
     private static final String TAG = "meet15_logs";
@@ -193,7 +199,7 @@ public class MainActivity extends AppCompatActivity implements Callback {
         setContentView(R.layout.view_activity);
         //init();
         execute(cities.keySet());
-        workThread.start();
+        //workThread.start();
     }
 
     private ServiceConnection serviceConnection = new ServiceConnection() {
@@ -279,22 +285,22 @@ public class MainActivity extends AppCompatActivity implements Callback {
     // Метод обновления RecyclerView. Запрос на обновление придет из другого Thread'-а, поэтому
     // само обновление явно запускаем в UI-Thread
     private void updateRecycler(String city) {
-        TextView weatherLabel = findViewById(R.id.weatherLabel);
+        /*TextView weatherLabel = findViewById(R.id.weatherLabel);
         weatherLabel.setText(city);
 
         runOnUiThread(() -> {
             if (mAdapter == null) initRecyclerView();
             else mAdapter.onNewData(data);
-        });
+        });*/
 
     }
 
     private void initRecyclerView() {
-        RecyclerView recyclerView = findViewById(R.id.recyclerView);
+        /*RecyclerView recyclerView = findViewById(R.id.recyclerView);
         mAdapter = new MyAdapter(this, data);
         recyclerView.setAdapter(mAdapter);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
-        recyclerView.setLayoutManager(layoutManager);
+        recyclerView.setLayoutManager(layoutManager);*/
     }
 
 
@@ -319,9 +325,15 @@ public class MainActivity extends AppCompatActivity implements Callback {
         Intent intent = ViewActivity.newIntent(this, uiHandler);
         intent.putStringArrayListExtra("cities", new ArrayList<>(cityList));
         startActivity(intent);
+        //continueInit(mActivity);
     }
 
     private void continueInit(ViewContract mActivity) {
-        mActivity.bindPresenter(new Presenter(mActivity));
+        Presenter presenter = new Presenter(mActivity);
+        UseCaseInteractor interactor = new UseCaseInteractor();
+        NetworkGateway networkGateway = new NetworkGateway();
+        DatabaseGateway databaseGateway = new DatabaseGateway(getApplicationContext());
+
+        mActivity.bindImplementations(presenter, interactor, networkGateway, databaseGateway);
     }
 }
