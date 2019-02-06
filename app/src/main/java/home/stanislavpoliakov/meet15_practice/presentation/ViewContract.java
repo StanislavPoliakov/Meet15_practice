@@ -6,7 +6,6 @@ import java.util.List;
 
 import home.stanislavpoliakov.meet15_practice.domain.DomainContract;
 import home.stanislavpoliakov.meet15_practice.presentation.presenter.BriefData;
-import home.stanislavpoliakov.meet15_practice.presentation.presenter.DetailData;
 
 public interface ViewContract {
 
@@ -18,10 +17,11 @@ public interface ViewContract {
 
     void showDetails(Bundle detailInfo);
 
-    void bindPresenter(DomainContract.Presenter presenter);
+    void initUIViews();
 
     void bindImplementations(DomainContract.Presenter presenter,
                              DomainContract.UseCase useCaseInteractor,
                              DomainContract.NetworkOperations networkGateway,
                              DomainContract.DatabaseOperations databaseGateway);
 }
+

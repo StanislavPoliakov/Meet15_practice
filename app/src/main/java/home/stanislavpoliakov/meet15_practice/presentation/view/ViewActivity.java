@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Handler;
 import android.os.Message;
-import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -24,7 +23,6 @@ import home.stanislavpoliakov.meet15_practice.R;
 import home.stanislavpoliakov.meet15_practice.domain.DomainContract;
 import home.stanislavpoliakov.meet15_practice.presentation.ViewContract;
 import home.stanislavpoliakov.meet15_practice.presentation.presenter.BriefData;
-import home.stanislavpoliakov.meet15_practice.presentation.presenter.DetailData;
 
 public class ViewActivity extends AppCompatActivity implements ViewContract, Callback {
     private static final String TAG = "meet15_logs";
@@ -41,17 +39,8 @@ public class ViewActivity extends AppCompatActivity implements ViewContract, Cal
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.view_activity);
-        Log.d(TAG, "onCreate: ");
-        //mPresenter = new Presenter(this);
-        //initUIViews();
         Message message = Message.obtain(null, 1, this);
         mHandler.sendMessage(message);
-    }
-
-    @Override
-    public void bindPresenter(DomainContract.Presenter presenter) {
-        this.mPresenter = presenter;
-        initUIViews();
     }
 
     @Override
@@ -94,7 +83,8 @@ public class ViewActivity extends AppCompatActivity implements ViewContract, Cal
         });
     }
 
-    private void initUIViews() {
+    @Override
+    public void initUIViews() {
         initLabel();
         //initRecyclerView();
         initSpinner();
@@ -122,21 +112,17 @@ public class ViewActivity extends AppCompatActivity implements ViewContract, Cal
     private void initSpinner() {
         spinner = findViewById(R.id.spinner);
         ArrayList<String> cities = this.getIntent().getStringArrayListExtra("cities");
-        Log.d(TAG, "initSpinner: cities.size = " + cities.size());
+        //Log.d(TAG, "initSpinner: cities.size = " + cities.size());
 
         ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<String>
                 (this, android.R.layout.simple_spinner_dropdown_item, cities);
         spinner.setAdapter(spinnerAdapter);
         spinner.setSelection(spinnerAdapter.getPosition("Москва")); // по умолчанию "Москва"
-        //setLabel(spinnerAdapter.getItem(spinner.getSelectedItemPosition()));
 
         // Если выбрали другой город - начинаем загрузку данных
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                /*cityName = (String) spinner.getSelectedItem();
-                cityLocation = cities.get(cityName);
-                workThread.fetchWeather();*/
                 String cityName = (String) spinner.getSelectedItem();
                 mPresenter.onSpinnerSelected(cityName);
             }

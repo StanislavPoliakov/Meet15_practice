@@ -9,6 +9,12 @@ import home.stanislavpoliakov.meet15_practice.domain.response_data.WDaily;
 import home.stanislavpoliakov.meet15_practice.domain.response_data.WFlags;
 import home.stanislavpoliakov.meet15_practice.domain.response_data.WHourly;
 
+
+/**
+ * Сущность данных уровня бизнес-логики.
+ * Надо сказать, что текущее объявление сущности данных некорректно, потому что через аннотации
+ * привязано к конкретной реализации базы данных. Нужно клонировать!
+ */
 @Entity (tableName = "weather")
 public class Weather {
     @PrimaryKey (autoGenerate = true)
